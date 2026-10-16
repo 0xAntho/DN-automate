@@ -1,0 +1,61 @@
+# Configuration du scanner. Copier en config.toml (ignoré par git) et ajuster.
+# Aucune clé privée ni aucun identifiant ici : le scanner ne lit que des données publiques.
+
+[scanner]
+interval_seconds = 60
+# Historique de funding rechargé au plus toutes les N secondes (il bouge une fois par heure).
+history_refresh_seconds = 900
+# Base SQLite où sont enregistrés les passages du scanner ("" pour désactiver).
+database_path = "scanner.db"
+
+[sizing]
+margin_per_leg_usd = 100
+leverage = 3            # notionnel par jambe = 100 x 3 = 300 USD
+
+[thresholds]
+# Écart de funding annualisé minimum pour ouvrir (0.15 = 15 %).
+min_annualized_spread = 0.15
+# Glissement maximum à l'entrée sur chaque jambe, en points de base.
+max_entry_slippage_bps = 15
+# Fenêtres de stabilité du funding, en heures (24 h, 3 j, 7 j, 30 j).
+stability_windows_hours = [24, 72, 168, 720]
+# Une fenêtre compte si l'historique en couvre au moins cette fraction.
+min_window_coverage = 0.9
+# Majoration de l'estimation du coût de sortie (0.25 = +25 %), et hors séance.
+exit_safety_margin = 0.25
+exit_safety_margin_off_hours = 1.0
+# Compter l'écart de prix entre plateformes quand il est en notre faveur.
+count_favorable_basis = true
+
+[exchanges.hyperliquid]
+base_url = "https://api.hyperliquid.xyz"
+# Palier 0 avec la remise de 5 % (13 HYPE stakés) : 0,045 % x 0,95.
+taker_fee = 0.0004275
+# Multiplicateur de frais des marchés HIP-3 par dex ("xyz" = trade.xyz : le double).
+hip3_fee_multiplier = { xyz = 2.0 }
+# Facteur appliqué quand growthMode est actif sur l'actif (au moins -90 %).
+growth_mode_fee_factor = 0.1
+
+[exchanges.arcus]
+base_url = "https://api.arcus.xyz"
+# Palier de frais lu dans GET /v1/feetiers (0 = Base).
+fee_tier_level = 0
+# Utilisé seulement si /v1/feetiers ne répond pas.
+fallback_taker_fee = 0.0005
+
+# Paires à scanner : un symbole commun et son nom sur chaque plateforme.
+# Liste d'exemple en attendant la vraie liste.
+[[pairs]]
+symbol = "NVDA"
+hyperliquid = "xyz:NVDA"
+arcus = "NVDA-USD"
+
+[[pairs]]
+symbol = "TSLA"
+hyperliquid = "xyz:TSLA"
+arcus = "TSLA-USD"
+
+[[pairs]]
+symbol = "AAPL"
+hyperliquid = "xyz:AAPL"
+arcus = "AAPL-USD"
